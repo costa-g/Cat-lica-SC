@@ -25,7 +25,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_60febd3ec1edf792f8f01f3dbad007b6 {
+                #map_b7930a173e7ab1b39e0722d34e58d01e {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -39,14 +39,14 @@
 <body>
     
     
-            <div class="folium-map" id="map_60febd3ec1edf792f8f01f3dbad007b6" ></div>
+            <div class="folium-map" id="map_b7930a173e7ab1b39e0722d34e58d01e" ></div>
         
 </body>
 <script>
     
     
-            var map_60febd3ec1edf792f8f01f3dbad007b6 = L.map(
-                "map_60febd3ec1edf792f8f01f3dbad007b6",
+            var map_b7930a173e7ab1b39e0722d34e58d01e = L.map(
+                "map_b7930a173e7ab1b39e0722d34e58d01e",
                 {
                     center: [-15.7801, -47.9292],
                     crs: L.CRS.EPSG3857,
@@ -60,13 +60,76 @@
 
         
     
-            var tile_layer_23acd3f777f364ecc324017e954b3eaa = L.tileLayer(
+            var tile_layer_901663b56e4d61f91b1bb1c2d61c4baa = L.tileLayer(
                 "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                 {"attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors", "detectRetina": false, "maxNativeZoom": 19, "maxZoom": 19, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
             );
         
     
-            tile_layer_23acd3f777f364ecc324017e954b3eaa.addTo(map_60febd3ec1edf792f8f01f3dbad007b6);
+            tile_layer_901663b56e4d61f91b1bb1c2d61c4baa.addTo(map_b7930a173e7ab1b39e0722d34e58d01e);
         
+    
+            var circle_marker_da135f4402004e77e303d8961e4d9570 = L.circleMarker(
+                [-23.5505, -46.6333],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_b7930a173e7ab1b39e0722d34e58d01e);
+        
+    
+        var popup_70dfb86262bfea2ff8a5c00f7848a314 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_0eb1175195a13f42d79cd6d24e263621 = $(`<div id="html_0eb1175195a13f42d79cd6d24e263621" style="width: 100.0%; height: 100.0%;">Município A</div>`)[0];
+                popup_70dfb86262bfea2ff8a5c00f7848a314.setContent(html_0eb1175195a13f42d79cd6d24e263621);
+            
+        
+
+        circle_marker_da135f4402004e77e303d8961e4d9570.bindPopup(popup_70dfb86262bfea2ff8a5c00f7848a314)
+        ;
+
+        
+    
+    
+            var circle_marker_a8eeef3f5de07f716f1f51f32e408437 = L.circleMarker(
+                [-22.9068, -43.1729],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_b7930a173e7ab1b39e0722d34e58d01e);
+        
+    
+        var popup_0fc7964bcdd627b2b9a7835cbea0f0be = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_3dbd3bd6ecac0e8cf8054c5eba2f4741 = $(`<div id="html_3dbd3bd6ecac0e8cf8054c5eba2f4741" style="width: 100.0%; height: 100.0%;">Município B</div>`)[0];
+                popup_0fc7964bcdd627b2b9a7835cbea0f0be.setContent(html_3dbd3bd6ecac0e8cf8054c5eba2f4741);
+            
+        
+
+        circle_marker_a8eeef3f5de07f716f1f51f32e408437.bindPopup(popup_0fc7964bcdd627b2b9a7835cbea0f0be)
+        ;
+
+        
+    
+    
+            var circle_marker_9dcd7e739842cffa1f76667df27604b0 = L.circleMarker(
+                [-21.1775, -44.8709],
+                {"bubblingMouseEvents": true, "color": "green", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "green", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_b7930a173e7ab1b39e0722d34e58d01e);
+        
+    
+        var popup_84f434028a2c2ef7f942aa280b302089 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_35e8f776fb79d9cbf7a2578f5d725b00 = $(`<div id="html_35e8f776fb79d9cbf7a2578f5d725b00" style="width: 100.0%; height: 100.0%;">Município C</div>`)[0];
+                popup_84f434028a2c2ef7f942aa280b302089.setContent(html_35e8f776fb79d9cbf7a2578f5d725b00);
+            
+        
+
+        circle_marker_9dcd7e739842cffa1f76667df27604b0.bindPopup(popup_84f434028a2c2ef7f942aa280b302089)
+        ;
+
+        
+    
 </script>
 </html>

@@ -6,6 +6,7 @@ from glob import glob
 import fitz
 import nltk
 from nltk.corpus import stopwords
+import matplotlib.ticker as mticker
 from collections import Counter
 import folium
 import matplotlib.pyplot as plt
@@ -13,7 +14,8 @@ import seaborn as sns
 from wordcloud import WordCloud
 from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
-import concurrent.futures
+from matplotlib import cm, colors
+from matplotlib import colormaps
 
 # Verificar e baixar stopwords apenas se ainda não estiverem instaladas
 def ensure_stopwords():
@@ -71,51 +73,127 @@ def load_data_from_folder(folder_path, file_pattern="*.csv"):
 
 # Funções para cada insight com tratamento de exceções
 
+import os
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 def insight_1_economia_influencia_eleicao(dados_candidatos, dados_bens):
     print("\nInsight 1: Economia e Influência na Eleição")
+    
     try:
-        prefeitos_eleitos = dados_candidatos[(dados_candidatos['DS_CARGO'] == 'prefeito') & (dados_candidatos['DS_SIT_TOT_TURNO'] == 'eleito')]
-        bens_eleitos = dados_bens[dados_bens['SQ_CANDIDATO'].isin(prefeitos_eleitos['SQ_CANDIDATO'])]
-        soma_bens_eleitos = bens_eleitos['VR_BEM_CANDIDATO'].mean()
-        bens_nao_eleitos = dados_bens[~dados_bens['SQ_CANDIDATO'].isin(prefeitos_eleitos['SQ_CANDIDATO'])]['VR_BEM_CANDIDATO'].mean()
+        # Verificação para garantir que a pasta output existe
+        os.makedirs("output", exist_ok=True)
 
-        print("Carregou os dados e fez a média.")
+        # Filtra os candidatos eleitos para prefeito
+        prefeitos_eleitos = dados_candidatos[
+            (dados_candidatos['DS_CARGO'].str.lower() == 'prefeito') &
+            (dados_candidatos['DS_SIT_TOT_TURNO'].str.lower() == 'eleito')
+        ][['SQ_CANDIDATO', 'NM_CANDIDATO']]
+
+        # Verificação: se prefeitos_eleitos está vazio
+        if prefeitos_eleitos.empty:
+            print("Nenhum prefeito eleito encontrado nos dados de candidatos.")
+            return
         
-        bens_media = pd.DataFrame({'Status': ['Eleitos', 'Não Eleitos'], 'Média de Bens Declarados': [soma_bens_eleitos, bens_nao_eleitos]})
-        bens_media.to_csv("output/media_bens_eleitos.csv", index=False)
+        # Converte a coluna de bens para float, substituindo vírgulas por pontos e valores não numéricos por NaN
+        dados_bens['VR_BEM_CANDIDATO'] = pd.to_numeric(
+            dados_bens['VR_BEM_CANDIDATO'].replace(',', '.', regex=True), errors='coerce'
+        )
 
-        print("Salvou a média em um arquivo CSV.")
+        # Calcula o total de bens de cada prefeito eleito
+        bens_eleitos = dados_bens[dados_bens['SQ_CANDIDATO'].isin(prefeitos_eleitos['SQ_CANDIDATO'])]
+        total_bens_por_candidato = bens_eleitos.groupby('SQ_CANDIDATO')['VR_BEM_CANDIDATO'].sum().reset_index()
 
-        plt.figure(figsize=(8, 5))
-        plt.bar(['Eleitos', 'Não Eleitos'], [soma_bens_eleitos, bens_nao_eleitos], color=['blue', 'red'])
-        plt.title("Média de Bens Declarados por Prefeitos Eleitos vs Não Eleitos")
-        plt.ylabel("Média de Bens Declarados (R$)")
-        plt.savefig("output/media_bens_eleitos.png")
+        # Verificação: se total_bens_por_candidato está vazio
+        if total_bens_por_candidato.empty:
+            print("Nenhum bem declarado encontrado para os prefeitos eleitos.")
+            return
+
+        # Filtra os 10 prefeitos eleitos com maior valor declarado de bens
+        top_10_bens = total_bens_por_candidato.nlargest(10, 'VR_BEM_CANDIDATO')
+        
+        # Junta com o nome dos candidatos para facilitar a visualização
+        top_10_bens = top_10_bens.merge(prefeitos_eleitos, on='SQ_CANDIDATO')
+        
+        # Salva os dados dos 10 maiores em um CSV na pasta output
+        top_10_bens.to_csv("output/total_bens_prefeitos_eleitos.csv", index=False)
+
+        # Geração e exibição do gráfico
+        plt.figure(figsize=(12, 8))
+        sns.barplot(
+            data=top_10_bens, 
+            x='NM_CANDIDATO', 
+            y='VR_BEM_CANDIDATO', 
+            color='blue'
+        )
+        plt.title("Top 10 Prefeitos Eleitos com Maior Total de Bens Declarados")
+        plt.xlabel("Nome do Candidato")
+        plt.ylabel("Total de Bens Declarados (R$)")
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        
+        # Salva e exibe o gráfico
+        plt.savefig("output/total_bens_prefeitos_eleitos.png")
+        plt.show()
         plt.close()
 
-        print("Salvou o gráfico em uma imagem PNG.")
     except Exception as e:
         print(f"Erro no insight 1 - economia_influencia_eleicao: {e}")
 
-def insight_2_coligacoes_disputas_vitoria(dados_candidatos, dados_coligacoes):
-    print("Insight 2: Coligações e Disputas de Vitoria")
-    try:
-        dados_coligacoes['NUMERO_PARTIDOS'] = dados_coligacoes['DS_COMPOSICAO_FEDERACAO'].str.count(',') + 1
-        coligacoes_eleitos = dados_candidatos[dados_candidatos['DS_SIT_TOT_TURNO'] == 'eleito']
-        coligacoes_resultados = coligacoes_eleitos.groupby('SQ_COLIGACAO').size().reset_index(name='NUM_ELEITOS')
-        coligacoes_detalhadas = dados_coligacoes.merge(coligacoes_resultados, on='SQ_COLIGACAO')
-        coligacoes_detalhadas.to_csv("output/coligacoes_detalhadas.csv", index=False)
 
-        plt.figure(figsize=(10, 6))
-        sns.scatterplot(data=coligacoes_detalhadas, x='NUMERO_PARTIDOS', y='NUM_ELEITOS', hue='NM_COLIGACAO')
-        plt.title("Número de Eleitos por Coligação x Número de Partidos")
-        plt.xlabel("Número de Partidos")
+def insight_2_coligacoes_disputas_vitoria(dados_candidatos, dados_coligacoes):
+    print("Insight 2: Coligações e Disputas de Vitória")
+    try:
+        # Verifica se a pasta de output existe
+        os.makedirs("output", exist_ok=True)
+        
+        # Calcula o número de partidos em cada coligação
+        dados_coligacoes['NUMERO_PARTIDOS'] = dados_coligacoes['DS_COMPOSICAO_FEDERACAO'].str.count(',') + 1
+        
+        # Filtra apenas os candidatos eleitos e agrupa por coligação
+        coligacoes_eleitos = dados_candidatos[dados_candidatos['DS_SIT_TOT_TURNO'].str.lower() == 'eleito']
+        coligacoes_resultados = coligacoes_eleitos.groupby(['SQ_COLIGACAO', 'SG_UF']).size().reset_index(name='NUM_ELEITOS')
+        
+        # Junta as informações de coligação com os resultados de eleição e UF
+        coligacoes_detalhadas = dados_coligacoes.merge(coligacoes_resultados, on='SQ_COLIGACAO', how='left')
+        coligacoes_detalhadas['NUM_ELEITOS'] = coligacoes_detalhadas['NUM_ELEITOS'].fillna(0)
+        
+        # Ordena pelos maiores valores de coligação e número de eleitos
+        coligacoes_detalhadas = coligacoes_detalhadas.sort_values(by=['NUMERO_PARTIDOS', 'NUM_ELEITOS'], ascending=[False, False])
+        
+        # Salva o resultado em um CSV
+        coligacoes_detalhadas.to_csv("output/coligacoes_detalhadas.csv", index=False)
+        
+        # Visualização com dispersão e tamanhos variáveis
+        plt.figure(figsize=(14, 8))
+        
+        # Gráfico de dispersão com tamanho do ponto proporcional ao número de eleitos, com UF como hue
+        scatter = sns.scatterplot(
+            data=coligacoes_detalhadas, 
+            x='NUMERO_PARTIDOS', 
+            y='NUM_ELEITOS', 
+            size='NUM_ELEITOS', 
+            hue='SG_UF_x', 
+            sizes=(40, 400),  # Define tamanho dos pontos
+            alpha=0.7, 
+            legend='full'
+        )
+
+        # Ajustes no gráfico
+        plt.title("Coligações: Número de Eleitos por Número de Partidos e UF")
+        plt.xlabel("Número de Partidos na Coligação")
         plt.ylabel("Número de Eleitos")
-        plt.legend([], [], frameon=False)
+        scatter.xaxis.set_major_locator(mticker.MaxNLocator(integer=True))  # Eixos em inteiros
+
+        # Salvando as figuras
         plt.savefig("output/coligacoes_eleitos.png")
-        plt.close()
+        plt.show()
+        
     except Exception as e:
         print(f"Erro no insight 2 - coligacoes_disputas_vitoria: {e}")
+
+
 
 def insight_3_maior_partido_uf(dados_candidatos):
     print("Insight 3: Maior Partido por UF")
@@ -260,36 +338,61 @@ def insight_8_termos_propostas_governo(stop_words, path_propostas='./data/candid
         print(f"Erro no insight 8 - termos_propostas: {e}")
 
 
-def insight_9_mapa_resultados_eleicao():
+# Função para gerar o mapa das eleições
+def insight_9_mapa_resultados_eleicao(dados_candidatos, dados_municipios):
     try:
-        resultados_municipios = pd.DataFrame({
-            'MUNICIPIO': ['Município A', 'Município B', 'Município C'],
-            'LATITUDE': [-23.5505, -22.9068, -21.1775],
-            'LONGITUDE': [-46.6333, -43.1729, -44.8709],
-            'PARTIDO_VENCEDOR': ['partido_a', 'partido_b', 'partido_c']
-        })
+        # Verifica se as colunas necessárias estão presentes em ambos os DataFrames
+        required_columns_candidatos = {'NM_UE', 'SG_PARTIDO', 'SG_UF', 'DS_SIT_TOT_TURNO'}
+        required_columns_municipios = {'MUNICIPIO', 'LATITUDE', 'LONGITUDE', 'SG_UF'}
         
-        # Mapa inicial
+        if not required_columns_candidatos.issubset(dados_candidatos.columns):
+            print("Colunas disponíveis em dados_candidatos:", dados_candidatos.columns)
+            raise ValueError(f"Colunas necessárias faltando em dados_candidatos: {required_columns_candidatos - set(dados_candidatos.columns)}")
+
+        if not required_columns_municipios.issubset(dados_municipios.columns):
+            print("Colunas disponíveis em dados_municipios:", dados_municipios.columns)
+            raise ValueError(f"Colunas necessárias faltando em dados_municipios: {required_columns_municipios - set(dados_municipios.columns)}")
+
+        # Filtra candidatos eleitos para cada município
+        candidatos_eleitos = dados_candidatos[dados_candidatos['DS_SIT_TOT_TURNO'].str.lower() == 'eleito']
+
+        # Mescla com dados dos municípios para obter as coordenadas
+        resultados_municipios = pd.merge(
+            candidatos_eleitos[['NM_UE', 'SG_PARTIDO', 'SG_UF']],
+            dados_municipios[['MUNICIPIO', 'LATITUDE', 'LONGITUDE', 'SG_UF']],
+            left_on=['NM_UE', 'SG_UF'],
+            right_on=['MUNICIPIO', 'SG_UF']
+        )
+
+        # Gera uma lista única de partidos vencedores para atribuir cores
+        partidos = resultados_municipios['SG_PARTIDO'].unique()
+        
+        # Cria o colormap e uma lista de cores baseada no número de partidos
+        cmap = colormaps['tab20']
+        colors = [cmap(i / len(partidos)) for i in range(len(partidos))]
+        
+        # Mapeia partidos a cores
+        partido_cores = {partido: colors[i] for i, partido in enumerate(partidos)}
+
+        # Inicializa o mapa centrado no Brasil
         mapa_brasil = folium.Map(location=[-15.7801, -47.9292], zoom_start=4)
-        cores_partidos = {'partido_a': 'blue', 'partido_b': 'red', 'partido_c': 'green'}
-        
-        # Função auxiliar para adicionar marcadores
-        def add_marker(row):
+
+        # Adiciona um marcador para cada município vencedor
+        for _, row in resultados_municipios.iterrows():
+            partido = row['SG_PARTIDO']
+            color = partido_cores.get(partido, 'gray')  # 'gray' para partidos sem cor mapeada
             folium.CircleMarker(
                 location=(row['LATITUDE'], row['LONGITUDE']),
                 radius=6,
-                color=cores_partidos.get(row['PARTIDO_VENCEDOR'], 'gray'),
+                color=color,
                 fill=True,
                 fill_opacity=0.7,
-                popup=row['MUNICIPIO']
+                popup=f"{row['MUNICIPIO']} ({partido})"
             ).add_to(mapa_brasil)
 
-        # Adiciona os marcadores em paralelo
-        with ProcessPoolExecutor() as executor:
-            executor.map(add_marker, [row for _, row in resultados_municipios.iterrows()])
-
+        # Salva o mapa como um arquivo HTML
         mapa_brasil.save("output/resultado_eleicoes_mapa.html")
-        print("Mapa gerado e salvo como resultado_eleicoes_mapa.html")
+        print("Mapa gerado e salvo como resultado_eleicoes_mapa_brasil.html")
         
     except Exception as e:
         print(f"Erro no insight 9 - mapa_resultados_eleicao: {e}")
@@ -329,23 +432,71 @@ def main():
     except AssertionError as e:
         print(e)
 
-    insights = [
-        (insight_1_economia_influencia_eleicao, [dados_candidatos, dados_bens]),
-        # (insight_2_coligacoes_disputas_vitoria, [dados_candidatos, dados_coligacoes]),
-        # (insight_3_maior_partido_uf, [dados_candidatos]),
-        # (insight_4_tendencia_regional_partido, [dados_candidatos]),
-        # (insight_5_partido_dominante_cargo, [dados_candidatos]),
-        # (insight_6_candidatos_indigenas_quilombolas, [dados_candidatos, dados_info_complementar]),
-        # (insight_7_rede_social_preferida, [dados_redes_sociais]),
-        # (insight_8_termos_propostas_governo, [stop_words]),
-        # (insight_9_mapa_resultados_eleicao, []),
-    ]
+    # Exemplo de estrutura do DataFrame de coordenadas dos municípios
+    municipios_coordenadas = pd.DataFrame({
+        'MUNICIPIO': [
+            'São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Salvador', 'Fortaleza',
+            'Brasília', 'Curitiba', 'Manaus', 'Recife', 'Porto Alegre',
+            'Belém', 'Goiânia', 'São Luís', 'Maceió', 'Natal',
+            'Campo Grande', 'Teresina', 'João Pessoa', 'Aracaju', 'Cuiabá',
+            'Florianópolis', 'Macapá', 'Rio Branco', 'Palmas', 'Boa Vista'
+        ],
+        'SG_UF': [
+            'SP', 'RJ', 'MG', 'BA', 'CE', 'DF', 'PR', 'AM', 'PE', 'RS',
+            'PA', 'GO', 'MA', 'AL', 'RN', 'MS', 'PI', 'PB', 'SE', 'MT',
+            'SC', 'AP', 'AC', 'TO', 'RR'
+        ],
+        'LATITUDE': [
+            -23.5505, -22.9068, -19.9245, -12.9714, -3.7172,
+            -15.7942, -25.429, -3.119, -8.0476, -30.0346,
+            -1.4558, -16.6869, -2.5307, -9.6498, -5.7945,
+            -20.4697, -5.0919, -7.1195, -10.9472, -15.601,
+            -27.5954, 0.0355, -9.9754, -10.1842, 2.8235
+        ],
+        'LONGITUDE': [
+            -46.6333, -43.1729, -43.9352, -38.5014, -38.5434,
+            -47.8822, -49.2671, -60.0217, -34.8783, -51.2177,
+            -48.4902, -49.2644, -44.3028, -35.7089, -35.211,
+            -54.6201, -42.8018, -34.845, -37.0731, -56.0979,
+            -48.548, -51.0664, -67.8243, -48.3277, -60.6758
+        ]
+    })
 
-    with tqdm(total=len(insights), desc="Processando Insights", unit="insight") as pbar:
-        with ProcessPoolExecutor() as executor:
-            futures = [executor.submit(insight, *args) for insight, args in insights]
-            for future in concurrent.futures.as_completed(futures):
-                pbar.update(1)
+    # Executa o insight 1 diretamente
+    # insight_1_economia_influencia_eleicao(dados_candidatos, dados_bens)
+    # print("Insight 1 processado com sucesso.")
+
+    # Executa o insight 2 diretamente
+    # insight_2_coligacoes_disputas_vitoria(dados_candidatos, dados_coligacoes)
+    # print("Insight 2 processado com sucesso.")
+
+    # Executa o insight 3 diretamente
+    # insight_3_maior_partido_uf(dados_candidatos)
+    # print("Insight 3 processado com sucesso.")
+
+    # Executa o insight 4 diretamente
+    # insight_4_tendencia_regional_partido(dados_candidatos)
+    # print("Insight 4 processado com sucesso.")
+
+    # Executa o insight 5 diretamente
+    # insight_5_partido_dominante_cargo(dados_candidatos)
+    # print("Insight 5 processado com sucesso.")
+
+    # Executa o insight 6 diretamente
+    # insight_6_candidatos_indigenas_quilombolas(dados_candidatos, dados_info_complementar)
+    # print("Insight 6 processado com sucesso.")
+
+    # Executa o insight 7 diretamente
+    # insight_7_rede_social_preferida(dados_redes_sociais)
+    # print("Insight 7 processado com sucesso.")
+
+    # Executa o insight 8 diretamente
+    # insight_8_termos_propostas(dados_candidatos)
+    # print("Insight 8 processado com sucesso.")
+
+    # Executa o insight 9 diretamente
+    insight_9_mapa_resultados_eleicao(dados_candidatos, municipios_coordenadas)
+    print("Insight 9 processado com sucesso.")
 
 if __name__ == "__main__":
     main()

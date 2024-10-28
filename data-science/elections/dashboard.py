@@ -17,7 +17,7 @@ output_path = "output/"
 
 # Insight 1: Média de Bens Declarados - Prefeitos Eleitos vs Não Eleitos
 st.subheader("Insight 1: Média de Bens Declarados - Prefeitos Eleitos vs Não Eleitos")
-st.image(output_path + "media_bens_eleitos.png", caption="Média de Bens Declarados pelos Prefeitos Eleitos e Não Eleitos")
+st.image(output_path + "total_bens_prefeitos_eleitos.png", caption="Média de Bens Declarados pelos Prefeitos Eleitos e Não Eleitos")
 
 # Insight 2: Coligações com Maior Número de Eleitos
 st.subheader("Insight 2: Coligações com Maior Número de Eleitos")
@@ -73,7 +73,7 @@ st.dataframe(termos_propostas)
 st.subheader("Insight 9: Mapeamento do Resultado das Eleições com Folium")
 st.write("Clique no link abaixo para visualizar o mapa dos resultados das eleições:")
 # Lê o conteúdo do arquivo HTML e incorpora no Streamlit
-with open("resultado_eleicoes_mapa.html", "r", encoding="utf-8") as file:
+with open("resultado_eleicoes_mapa_brasil.html", "r", encoding="utf-8") as file:
     mapa_html = file.read()
 
 st.components.v1.html(mapa_html, height=600, scrolling=True)
