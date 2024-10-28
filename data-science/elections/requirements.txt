@@ -1,0 +1,9 @@
+pandas
+numpy
+matplotlib
+seaborn
+streamlit
+folium
+nltk
+pymupdf
+wordcloud

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_ab8fbe6274dc8f85580dca75453c97bf {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_ab8fbe6274dc8f85580dca75453c97bf" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_ab8fbe6274dc8f85580dca75453c97bf = L.map(
+                "map_ab8fbe6274dc8f85580dca75453c97bf",
+                {
+                    center: [-15.7801, -47.9292],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 4,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_a92f91bebacbbbc6bfea27446faa2d54 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors", "detectRetina": false, "maxNativeZoom": 19, "maxZoom": 19, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            );
+        
+    
+            tile_layer_a92f91bebacbbbc6bfea27446faa2d54.addTo(map_ab8fbe6274dc8f85580dca75453c97bf);
+        
+    
+            var circle_marker_c7e89047624a1825f61cd1f6b8a75a1d = L.circleMarker(
+                [-23.5505, -46.6333],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_ab8fbe6274dc8f85580dca75453c97bf);
+        
+    
+        var popup_41519fee4a350b10a9c79de3ca366487 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_c30acb5dbfdcb46d800218c24b8483a7 = $(`<div id="html_c30acb5dbfdcb46d800218c24b8483a7" style="width: 100.0%; height: 100.0%;">Município A</div>`)[0];
+                popup_41519fee4a350b10a9c79de3ca366487.setContent(html_c30acb5dbfdcb46d800218c24b8483a7);
+            
+        
+
+        circle_marker_c7e89047624a1825f61cd1f6b8a75a1d.bindPopup(popup_41519fee4a350b10a9c79de3ca366487)
+        ;
+
+        
+    
+    
+            var circle_marker_bf7a2b84aa730a3915c324ec30e15e9a = L.circleMarker(
+                [-22.9068, -43.1729],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_ab8fbe6274dc8f85580dca75453c97bf);
+        
+    
+        var popup_68c794498e1201b15ecf2425547f5b58 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_4c10d765bb3f86ffecfcc7c005f67cf3 = $(`<div id="html_4c10d765bb3f86ffecfcc7c005f67cf3" style="width: 100.0%; height: 100.0%;">Município B</div>`)[0];
+                popup_68c794498e1201b15ecf2425547f5b58.setContent(html_4c10d765bb3f86ffecfcc7c005f67cf3);
+            
+        
+
+        circle_marker_bf7a2b84aa730a3915c324ec30e15e9a.bindPopup(popup_68c794498e1201b15ecf2425547f5b58)
+        ;
+
+        
+    
+    
+            var circle_marker_2a09b8765268eef91dd8f2ff40d83f27 = L.circleMarker(
+                [-21.1775, -44.8709],
+                {"bubblingMouseEvents": true, "color": "green", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "green", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_ab8fbe6274dc8f85580dca75453c97bf);
+        
+    
+        var popup_514f39f3cb76685b5e8de4901f324f09 = L.popup({"maxWidth": "100%"});
+
+        
+            
+                var html_518bfb9ad0cd0b01416711a852993625 = $(`<div id="html_518bfb9ad0cd0b01416711a852993625" style="width: 100.0%; height: 100.0%;">Município C</div>`)[0];
+                popup_514f39f3cb76685b5e8de4901f324f09.setContent(html_518bfb9ad0cd0b01416711a852993625);
+            
+        
+
+        circle_marker_2a09b8765268eef91dd8f2ff40d83f27.bindPopup(popup_514f39f3cb76685b5e8de4901f324f09)
+        ;
+
+        
+    
+</script>
+</html>

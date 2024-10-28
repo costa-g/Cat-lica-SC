@@ -1,0 +1,29 @@
+# Ignorar ambientes virtuais
+.venv/
+venv/
+env/
+env.bak/
+
+# Ignorar arquivos de ambiente
+.env
+
+# Ignorar arquivos de compilação
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignorar arquivos de configuração locais
+*.local
+*.log
+
+# Ignorar diretórios de dependências
+pip-log.txt
+pip-selfcheck.json
+
+# Ignorar IDEs e editores
+.vscode/
+.idea/
+*.iml
+
+# Ignorar data
+data/
